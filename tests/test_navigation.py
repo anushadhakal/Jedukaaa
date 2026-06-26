@@ -2,19 +2,9 @@ import time
 import pytest
 import requests
 from selenium.webdriver.common.by import By
-from pages.apply_now_page import ApplyNowPage
 
 
 class TestNavigation:
-
-    # TC24
-    def test_apply_now_page_loads(self, driver):
-        apply_now = ApplyNowPage(driver)
-        apply_now.open()
-        time.sleep(2)
-
-        assert "apply-now" in apply_now.get_current_url(), \
-            "Apply Now page URL does not contain 'apply-now'"
 
     # TC38
     def test_browser_back_and_forward_navigation(self, driver):

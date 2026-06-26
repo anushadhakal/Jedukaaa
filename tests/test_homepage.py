@@ -1,35 +1,41 @@
 import time
 import pytest
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support.ui import WebDriverWait, Select
 from selenium.webdriver.support import expected_conditions as EC
 from pages.home_page import HomePage
 
 
 class TestHomePage:
 
+    url = "https://www.jeduka.com/"
+
     # TC01
     def test_homepage_title_and_url(self, driver):
-        home = HomePage(driver)
-        home.open()
+        self.driver = driver
+        self.driver.get(self.url)
 
-        assert "Study Abroad" in home.get_title(), "Homepage title is incorrect"
-        assert "jeduka.com" in home.get_current_url(), "Homepage URL does not contain jeduka.com"
+        assert "Study Abroad" in self.driver.title, "Homepage title is incorrect"
+        assert "jeduka.com" in self.driver.current_url, "Homepage URL does not contain jeduka.com"
 
     # TC02
     def test_jeduka_logo_is_visible(self, driver):
-        home = HomePage(driver)
-        home.open()
+        self.driver = driver
+        self.driver.get(self.url)
+        home = HomePage(self.driver)
 
-        assert home.is_logo_visible(), "Jeduka logo is not visible on the homepage"
+        logo = WebDriverWait(self.driver, 10).until(
+            EC.visibility_of_element_located((By.XPATH, home.logo_xpath))
+        )
+        assert logo.is_displayed(), "Jeduka logo is not visible on the homepage"
 
     # TC03
     def test_all_navbar_items_visible(self, driver):
-        home = HomePage(driver)
-        home.open()
+        self.driver = driver
+        self.driver.get(self.url)
+        home = HomePage(self.driver)
 
-        navbar_items = home.get_all_navbar_items()
-        navbar_text = " ".join(navbar_items)
+        navbar_text = " ".join(home.get_all_navbar_items())
 
         assert "Country" in navbar_text, "Country not found in navbar"
         assert "Courses" in navbar_text, "Courses not found in navbar"
@@ -40,37 +46,33 @@ class TestHomePage:
 
     # TC04
     def test_navbar_dropdowns_open(self, driver):
-        home = HomePage(driver)
-        home.open()
+        self.driver = driver
+        self.driver.get(self.url)
+        home = HomePage(self.driver)
 
-        result = home.hover_and_check_dropdown(home.country_dropdown_xpath)
-        assert result, "Country dropdown did not open"
+        assert home.hover_and_check_dropdown(home.country_dropdown_xpath), "Country dropdown did not open"
         time.sleep(1)
-
-        result = home.hover_and_check_dropdown(home.exam_dropdown_xpath)
-        assert result, "Exam dropdown did not open"
+        assert home.hover_and_check_dropdown(home.exam_dropdown_xpath), "Exam dropdown did not open"
 
     # TC06
     def test_search_now_button_works(self, driver):
-        from selenium.webdriver.support.ui import Select
-        home = HomePage(driver)
-        home.open()
+        self.driver = driver
+        self.driver.get(self.url)
         time.sleep(2)
+        home = HomePage(self.driver)
 
-        country_dropdown = WebDriverWait(driver, 10).until(
+        country_dropdown = WebDriverWait(self.driver, 10).until(
             EC.presence_of_element_located(
                 (By.XPATH, "//select[contains(@name,'country') or contains(@id,'country')]")
             )
         )
-        Select(country_dropdown).select_by_index(1)  # pick first real option
+        Select(country_dropdown).select_by_index(1)
         time.sleep(1)
 
         home.click_search_now_button()
         time.sleep(3)
 
-        # BUG-002: SEARCH NOW must navigate to a filtered results page.
-        # The URL should contain a search/filter parameter reflecting the chosen country.
-        current_url = driver.current_url
+        current_url = self.driver.current_url
         assert (
             "search" in current_url.lower()
             or "filter" in current_url.lower()
@@ -84,76 +86,91 @@ class TestHomePage:
 
     # TC07
     def test_request_free_advice_button_visible(self, driver):
-        home = HomePage(driver)
-        home.open()
+        self.driver = driver
+        self.driver.get(self.url)
+        home = HomePage(self.driver)
 
-        assert home.is_request_free_advice_visible(), "REQUEST FREE ADVICE button is not visible"
+        element = WebDriverWait(self.driver, 10).until(
+            EC.visibility_of_element_located((By.XPATH, home.request_free_advice_xpath))
+        )
+        assert element.is_displayed(), "REQUEST FREE ADVICE button is not visible"
 
     # TC08
     def test_contact_elements_visible(self, driver):
-        home = HomePage(driver)
-        home.open()
+        self.driver = driver
+        self.driver.get(self.url)
+        home = HomePage(self.driver)
 
-        assert home.is_whatsapp_icon_visible(), "WhatsApp icon is not visible"
-        assert home.is_phone_number_visible(), "Phone number is not visible"
+        whatsapp = self.driver.find_element(By.XPATH, home.whatsapp_icon_xpath)
+        assert whatsapp.is_displayed(), "WhatsApp icon is not visible"
+
+        phone = self.driver.find_element(By.XPATH, home.phone_number_xpath)
+        assert phone.is_displayed(), "Phone number is not visible"
 
     # TC09
     def test_search_icon_opens_search(self, driver):
-        home = HomePage(driver)
-        home.open()
+        self.driver = driver
+        self.driver.get(self.url)
+        home = HomePage(self.driver)
 
         try:
             home.click_search_icon()
             time.sleep(1)
-            search_input = driver.find_element(By.XPATH, "//input[@type='search'] | //input[@type='text'][contains(@class,'search')]")
+            search_input = self.driver.find_element(
+                By.XPATH, "//input[@type='search'] | //input[@type='text'][contains(@class,'search')]"
+            )
             assert search_input.is_displayed(), "Search input did not appear after clicking search icon"
         except Exception as e:
             pytest.skip(f"Search icon not found with expected locator: {e}")
 
     # TC10
     def test_explore_countries_button_navigates(self, driver):
-        home = HomePage(driver)
-        home.open()
+        self.driver = driver
+        self.driver.get(self.url)
+        home = HomePage(self.driver)
 
         try:
             home.scroll_and_click_explore_countries()
             time.sleep(2)
-            assert "study-abroad" in driver.current_url, "Did not navigate to study-abroad page"
+            assert "study-abroad" in self.driver.current_url, "Did not navigate to study-abroad page"
         except Exception as e:
             pytest.skip(f"Explore Countries button not found: {e}")
 
     # TC11
     def test_view_all_countries_button_navigates(self, driver):
-        home = HomePage(driver)
-        home.open()
+        self.driver = driver
+        self.driver.get(self.url)
+        home = HomePage(self.driver)
 
         try:
             home.scroll_and_click_view_all_countries()
             time.sleep(2)
-            assert "study-abroad" in driver.current_url, "Did not navigate to study-abroad page"
+            assert "study-abroad" in self.driver.current_url, "Did not navigate to study-abroad page"
         except Exception as e:
             pytest.skip(f"View All Countries button not found: {e}")
 
     # TC13
     def test_view_all_exams_button_navigates(self, driver):
-        home = HomePage(driver)
-        home.open()
+        self.driver = driver
+        self.driver.get(self.url)
+        home = HomePage(self.driver)
 
         try:
             home.scroll_and_click_view_all_exams()
             time.sleep(2)
-            assert "exams" in driver.current_url, "Did not navigate to exams page"
+            assert "exams" in self.driver.current_url, "Did not navigate to exams page"
         except Exception as e:
             pytest.skip(f"View All Exams button not found: {e}")
 
     # TC25
     def test_view_all_articles_button_navigates(self, driver):
-        home = HomePage(driver)
-        home.open()
+        self.driver = driver
+        self.driver.get(self.url)
+        home = HomePage(self.driver)
 
         try:
             home.scroll_and_click_view_all_articles()
             time.sleep(2)
-            assert "articles" in driver.current_url, "Did not navigate to articles page"
+            assert "articles" in self.driver.current_url, "Did not navigate to articles page"
         except Exception as e:
             pytest.skip(f"View All Articles button not found: {e}")

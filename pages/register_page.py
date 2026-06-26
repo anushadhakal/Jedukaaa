@@ -6,103 +6,44 @@ from selenium.webdriver.support.ui import Select
 
 class RegisterPage:
 
-    url = "https://www.jeduka.com/register.html"
+    # Step headings — exact text visible on page
+    step1_heading_xpath = "//*[contains(text(),'Personal Details')]"
+    step2_heading_xpath = "//*[contains(text(),'Future Education Prospects')]"
+    step3_heading_xpath = "//*[contains(text(),'Current education details')]"
 
-    # Step 1 locators — broader value/label matching
-    male_radio_xpath = (
-        "//input[@type='radio' and ("
-        "@value='Male' or @value='male' or @value='M' or @value='m' or @value='1'"
-        ")] | "
-        "//label[normalize-space(translate(text(),"
-        "'abcdefghijklmnopqrstuvwxyz','ABCDEFGHIJKLMNOPQRSTUVWXYZ'))='MALE']//input[@type='radio'] | "
-        "//label[normalize-space(translate(text(),"
-        "'abcdefghijklmnopqrstuvwxyz','ABCDEFGHIJKLMNOPQRSTUVWXYZ'))='MALE']"
-    )
-    female_radio_xpath = (
-        "//input[@type='radio' and ("
-        "@value='Female' or @value='female' or @value='F' or @value='f' or @value='2'"
-        ")] | "
-        "//label[normalize-space(translate(text(),"
-        "'abcdefghijklmnopqrstuvwxyz','ABCDEFGHIJKLMNOPQRSTUVWXYZ'))='FEMALE']//input[@type='radio'] | "
-        "//label[normalize-space(translate(text(),"
-        "'abcdefghijklmnopqrstuvwxyz','ABCDEFGHIJKLMNOPQRSTUVWXYZ'))='FEMALE']"
-    )
-    country_dropdown_xpath = "//select[contains(@name,'country') or contains(@id,'country')]"
-    state_dropdown_xpath = "//select[contains(@name,'state') or contains(@id,'state')]"
+    # Step 1 — Personal Details
+    # Using the placeholder text inside the first <option> to uniquely identify each dropdown
+    full_name_xpath = "//input[@placeholder='Full Name']"
+    email_xpath = "//input[@placeholder='Email Id']"
+    mobile_xpath = "//input[@placeholder='Mobile Number']"
+    country_dropdown_xpath = "//select[./option[contains(text(),'Country You Are Currently Living In')]]"
+    state_dropdown_xpath = "//select[./option[contains(text(),'State You Are Currently Living In')]]"
 
-    # Step 2 locators — broader name/id matching
-    preferred_country_xpath = (
-        "//select[contains(@name,'preferredCountry') or contains(@id,'preferredCountry') or "
-        "contains(@name,'preferred_country') or contains(@id,'preferred_country') or "
-        "contains(@name,'study_country') or contains(@id,'study_country') or "
-        "contains(@name,'country_preference') or contains(@id,'country_preference') or "
-        "contains(@name,'prefCountry') or contains(@id,'prefCountry') or "
-        "contains(@class,'preferredCountry') or contains(@class,'preferred-country')]"
-    )
-    preferred_course_xpath = (
-        "//select[contains(@name,'preferredCourse') or contains(@id,'preferredCourse') or "
-        "contains(@name,'preferred_course') or contains(@id,'preferred_course') or "
-        "contains(@name,'course_preference') or contains(@id,'course_preference') or "
-        "contains(@name,'prefCourse') or contains(@id,'prefCourse') or "
-        "contains(@class,'preferredCourse') or contains(@class,'preferred-course')]"
-    )
+    # Step 2 — Future Education Prospects
+    preferred_country_xpath = "//select[./option[contains(text(),'Preferred Country')]]"
+    preferred_course_xpath = "//select[./option[contains(text(),'Preferred Course')]]"
 
-    # Step 3 locators — broader exam checkbox matching
-    ielts_checkbox_xpath = (
-        "//input[@type='checkbox' and ("
-        "contains(translate(@value,'abcdefghijklmnopqrstuvwxyz','ABCDEFGHIJKLMNOPQRSTUVWXYZ'),'IELTS') or "
-        "contains(translate(@name,'abcdefghijklmnopqrstuvwxyz','ABCDEFGHIJKLMNOPQRSTUVWXYZ'),'IELTS') or "
-        "contains(translate(@id,'abcdefghijklmnopqrstuvwxyz','ABCDEFGHIJKLMNOPQRSTUVWXYZ'),'IELTS')"
-        ")] | "
-        "//label[contains(translate(text(),'abcdefghijklmnopqrstuvwxyz','ABCDEFGHIJKLMNOPQRSTUVWXYZ'),'IELTS')]"
-        "//input[@type='checkbox'] | "
-        "//label[contains(translate(text(),'abcdefghijklmnopqrstuvwxyz','ABCDEFGHIJKLMNOPQRSTUVWXYZ'),'IELTS')]"
-    )
-    toefl_checkbox_xpath = (
-        "//input[@type='checkbox' and ("
-        "contains(translate(@value,'abcdefghijklmnopqrstuvwxyz','ABCDEFGHIJKLMNOPQRSTUVWXYZ'),'TOEFL') or "
-        "contains(translate(@name,'abcdefghijklmnopqrstuvwxyz','ABCDEFGHIJKLMNOPQRSTUVWXYZ'),'TOEFL') or "
-        "contains(translate(@id,'abcdefghijklmnopqrstuvwxyz','ABCDEFGHIJKLMNOPQRSTUVWXYZ'),'TOEFL')"
-        ")] | "
-        "//label[contains(translate(text(),'abcdefghijklmnopqrstuvwxyz','ABCDEFGHIJKLMNOPQRSTUVWXYZ'),'TOEFL')]"
-        "//input[@type='checkbox'] | "
-        "//label[contains(translate(text(),'abcdefghijklmnopqrstuvwxyz','ABCDEFGHIJKLMNOPQRSTUVWXYZ'),'TOEFL')]"
-    )
+    # Step 3 — Exam Appeared (radio buttons — only one can be selected at a time)
+    ielts_radio_xpath = "//label[contains(.,'IELTS')]//input[@type='radio'] | //input[@type='radio' and (@value='IELTS' or @value='ielts')]"
+    toefl_radio_xpath = "//label[contains(.,'TOEFL')]//input[@type='radio'] | //input[@type='radio' and (@value='TOEFL' or @value='toefl')]"
 
-    # Privacy & Submit
-    privacy_checkbox_xpath = "//input[@type='checkbox' and contains(@name,'privacy')] | //input[@id='privacyPolicy']"
-    submit_button_xpath = "//button[contains(text(),'Submit') or contains(text(),'SUBMIT')]"
+    # Privacy checkbox and submit button — exact text from page
+    privacy_checkbox_xpath = "//input[@type='checkbox']"
+    submit_button_xpath = "//button[contains(translate(text(),'abcdefghijklmnopqrstuvwxyz','ABCDEFGHIJKLMNOPQRSTUVWXYZ'),'SUBMIT TO GET CALL BACK')]"
     privacy_policy_link_xpath = "//a[contains(text(),'Privacy Policy')]"
-    terms_link_xpath = "//a[contains(text(),'Terms and Conditions') or contains(text(),'Terms')]"
-
-    # Step headings — broader matching including common alternative labels
-    step1_heading_xpath = "//*[contains(text(),'Personal Details') or contains(text(),'Step 1')]"
-    step2_heading_xpath = "//*[contains(text(),'Future Education') or contains(text(),'Step 2')]"
-    step3_heading_xpath = (
-        "//*[contains(text(),'Current Education') or contains(text(),'Step 3') or "
-        "contains(text(),'Academic') or contains(text(),'Exam Details') or "
-        "contains(text(),'Test Score') or contains(text(),'Educational Background')] | "
-        "//*[@data-step='3'] | //*[@data-index='2']"
-    )
+    terms_link_xpath = "//a[contains(text(),'Terms and Conditions')]"
 
     def __init__(self, driver):
         self.driver = driver
 
-    def open(self):
-        self.driver.get(self.url)
-
-    def get_title(self):
-        return self.driver.title
-
-    def get_current_url(self):
-        return self.driver.current_url
+    # ── Step visibility ────────────────────────────────────────────────────────
 
     def is_step1_visible(self):
         try:
-            element = WebDriverWait(self.driver, 10).until(
+            WebDriverWait(self.driver, 10).until(
                 EC.visibility_of_element_located((By.XPATH, self.step1_heading_xpath))
             )
-            return element.is_displayed()
+            return True
         except:
             return False
 
@@ -115,111 +56,40 @@ class RegisterPage:
 
     def is_step3_visible(self):
         try:
-            elements = self.driver.find_elements(By.XPATH, self.step3_heading_xpath)
-            if elements:
-                return True
-            # Fall back to JS: check for 3+ step indicators in the DOM
-            return bool(self.driver.execute_script("""
-                var stepEls = document.querySelectorAll(
-                    '.step, .wizard-step, [class*="step"], [data-step], li.active ~ li'
-                );
-                return stepEls.length >= 2;
-            """))
+            element = self.driver.find_element(By.XPATH, self.step3_heading_xpath)
+            return element.is_displayed()
         except:
             return False
 
-    # ── Radio buttons ──────────────────────────────────────────────────────────
+    # ── Personal Details inputs ────────────────────────────────────────────────
 
-    def click_male_radio(self):
-        try:
-            element = WebDriverWait(self.driver, 5).until(
-                EC.element_to_be_clickable((By.XPATH, self.male_radio_xpath))
-            )
-            element.click()
-            return
-        except Exception:
-            pass
-        # JavaScript fallback
-        clicked = self.driver.execute_script("""
-            for (var v of ['Male', 'male', 'MALE', 'M', 'm', '1']) {
-                var r = document.querySelector('input[type="radio"][value="' + v + '"]');
-                if (r) { r.click(); return true; }
-            }
-            for (var l of document.querySelectorAll('label')) {
-                if (['male', 'Male', 'MALE'].indexOf(l.textContent.trim()) !== -1) {
-                    var forId = l.getAttribute('for');
-                    var inp = forId ? document.getElementById(forId) : l.querySelector('input[type="radio"]');
-                    if (inp) { inp.click(); return true; }
-                    l.click(); return true;
-                }
-            }
-            var all = document.querySelectorAll('input[type="radio"]');
-            if (all.length > 0) { all[0].click(); return true; }
-            return false;
-        """)
-        if not clicked:
-            raise Exception("Male radio button not found on page")
+    def enter_full_name(self, name):
+        field = WebDriverWait(self.driver, 10).until(
+            EC.presence_of_element_located((By.XPATH, self.full_name_xpath))
+        )
+        field.clear()
+        field.send_keys(name)
 
-    def click_female_radio(self):
-        try:
-            element = WebDriverWait(self.driver, 5).until(
-                EC.element_to_be_clickable((By.XPATH, self.female_radio_xpath))
-            )
-            element.click()
-            return
-        except Exception:
-            pass
-        clicked = self.driver.execute_script("""
-            for (var v of ['Female', 'female', 'FEMALE', 'F', 'f', '2']) {
-                var r = document.querySelector('input[type="radio"][value="' + v + '"]');
-                if (r) { r.click(); return true; }
-            }
-            for (var l of document.querySelectorAll('label')) {
-                if (['female', 'Female', 'FEMALE'].indexOf(l.textContent.trim()) !== -1) {
-                    var forId = l.getAttribute('for');
-                    var inp = forId ? document.getElementById(forId) : l.querySelector('input[type="radio"]');
-                    if (inp) { inp.click(); return true; }
-                    l.click(); return true;
-                }
-            }
-            var all = document.querySelectorAll('input[type="radio"]');
-            if (all.length > 1) { all[1].click(); return true; }
-            return false;
-        """)
-        if not clicked:
-            raise Exception("Female radio button not found on page")
+    def enter_email(self, email):
+        field = WebDriverWait(self.driver, 10).until(
+            EC.presence_of_element_located((By.XPATH, self.email_xpath))
+        )
+        field.clear()
+        field.send_keys(email)
 
-    def is_male_radio_selected(self):
-        try:
-            elements = self.driver.find_elements(By.XPATH, self.male_radio_xpath)
-            if elements:
-                return elements[0].is_selected()
-        except Exception:
-            pass
-        return bool(self.driver.execute_script("""
-            for (var v of ['Male', 'male', 'MALE', 'M', 'm', '1']) {
-                var r = document.querySelector('input[type="radio"][value="' + v + '"]');
-                if (r) return r.checked;
-            }
-            var all = document.querySelectorAll('input[type="radio"]');
-            return all.length > 0 ? all[0].checked : false;
-        """))
+    def enter_mobile(self, mobile):
+        field = WebDriverWait(self.driver, 10).until(
+            EC.presence_of_element_located((By.XPATH, self.mobile_xpath))
+        )
+        field.clear()
+        field.send_keys(mobile)
 
-    def is_female_radio_selected(self):
-        try:
-            elements = self.driver.find_elements(By.XPATH, self.female_radio_xpath)
-            if elements:
-                return elements[0].is_selected()
-        except Exception:
-            pass
-        return bool(self.driver.execute_script("""
-            for (var v of ['Female', 'female', 'FEMALE', 'F', 'f', '2']) {
-                var r = document.querySelector('input[type="radio"][value="' + v + '"]');
-                if (r) return r.checked;
-            }
-            var all = document.querySelectorAll('input[type="radio"]');
-            return all.length > 1 ? all[1].checked : false;
-        """))
+    def click_privacy_checkbox(self):
+        checkbox = WebDriverWait(self.driver, 10).until(
+            EC.presence_of_element_located((By.XPATH, self.privacy_checkbox_xpath))
+        )
+        self.driver.execute_script("arguments[0].scrollIntoView(true);", checkbox)
+        self.driver.execute_script("arguments[0].click();", checkbox)
 
     # ── Country / State dropdowns ──────────────────────────────────────────────
 
@@ -227,15 +97,13 @@ class RegisterPage:
         dropdown = WebDriverWait(self.driver, 10).until(
             EC.presence_of_element_located((By.XPATH, self.country_dropdown_xpath))
         )
-        select = Select(dropdown)
-        return [option.text for option in select.options]
+        return [option.text for option in Select(dropdown).options]
 
     def select_country(self, country_name):
         dropdown = WebDriverWait(self.driver, 10).until(
             EC.presence_of_element_located((By.XPATH, self.country_dropdown_xpath))
         )
-        select = Select(dropdown)
-        select.select_by_visible_text(country_name)
+        Select(dropdown).select_by_visible_text(country_name)
 
     def get_state_dropdown_options(self):
         import time
@@ -243,8 +111,7 @@ class RegisterPage:
         dropdown = WebDriverWait(self.driver, 10).until(
             EC.presence_of_element_located((By.XPATH, self.state_dropdown_xpath))
         )
-        select = Select(dropdown)
-        return [option.text for option in select.options]
+        return [option.text for option in Select(dropdown).options]
 
     # ── Preferred country / course dropdowns ───────────────────────────────────
 
@@ -253,11 +120,9 @@ class RegisterPage:
             dropdown = WebDriverWait(self.driver, 5).until(
                 EC.presence_of_element_located((By.XPATH, self.preferred_country_xpath))
             )
-            select = Select(dropdown)
-            return [option.text for option in select.options]
+            return [option.text for option in Select(dropdown).options]
         except Exception:
             pass
-        # JS fallback: find any <select> whose options include major study destinations
         study_dests = ['USA', 'United States', 'UK', 'United Kingdom',
                        'Australia', 'Canada', 'Germany', 'France']
         return self.driver.execute_script("""
@@ -278,8 +143,7 @@ class RegisterPage:
             dropdown = WebDriverWait(self.driver, 5).until(
                 EC.presence_of_element_located((By.XPATH, self.preferred_course_xpath))
             )
-            select = Select(dropdown)
-            return [option.text for option in select.options]
+            return [option.text for option in Select(dropdown).options]
         except Exception:
             pass
         course_keywords = ['MBA', 'Engineering', 'Medicine', 'Science',
@@ -297,96 +161,98 @@ class RegisterPage:
             return [];
         """, course_keywords) or []
 
-    # ── Exam checkboxes ────────────────────────────────────────────────────────
+    # ── Exam radio buttons ─────────────────────────────────────────────────────
 
-    def click_ielts_checkbox(self):
+    def click_ielts_radio(self):
         try:
             element = WebDriverWait(self.driver, 5).until(
-                EC.element_to_be_clickable((By.XPATH, self.ielts_checkbox_xpath))
+                EC.element_to_be_clickable((By.XPATH, self.ielts_radio_xpath))
             )
             element.click()
             return
         except Exception:
             pass
         clicked = self.driver.execute_script("""
-            var checkboxes = document.querySelectorAll('input[type="checkbox"]');
-            for (var c of checkboxes) {
-                if ((c.value || c.name || c.id || '').toLowerCase().indexOf('ielts') !== -1) {
-                    c.click(); return true;
-                }
-            }
             for (var l of document.querySelectorAll('label')) {
                 if (l.textContent.toUpperCase().indexOf('IELTS') !== -1) {
-                    var forId = l.getAttribute('for');
-                    var inp = forId ? document.getElementById(forId) : l.querySelector('input[type="checkbox"]');
-                    if (inp) { inp.click(); return true; }
+                    var r = l.querySelector('input[type="radio"]');
+                    if (r) { r.click(); return true; }
                     l.click(); return true;
+                }
+            }
+            for (var r of document.querySelectorAll('input[type="radio"]')) {
+                if ((r.value || '').toUpperCase().indexOf('IELTS') !== -1) {
+                    r.click(); return true;
                 }
             }
             return false;
         """)
         if not clicked:
-            raise Exception("IELTS checkbox not found on page")
+            raise Exception("IELTS radio button not found on page")
 
-    def click_toefl_checkbox(self):
+    def click_toefl_radio(self):
         try:
             element = WebDriverWait(self.driver, 5).until(
-                EC.element_to_be_clickable((By.XPATH, self.toefl_checkbox_xpath))
+                EC.element_to_be_clickable((By.XPATH, self.toefl_radio_xpath))
             )
             element.click()
             return
         except Exception:
             pass
         clicked = self.driver.execute_script("""
-            var checkboxes = document.querySelectorAll('input[type="checkbox"]');
-            for (var c of checkboxes) {
-                if ((c.value || c.name || c.id || '').toLowerCase().indexOf('toefl') !== -1) {
-                    c.click(); return true;
-                }
-            }
             for (var l of document.querySelectorAll('label')) {
                 if (l.textContent.toUpperCase().indexOf('TOEFL') !== -1) {
-                    var forId = l.getAttribute('for');
-                    var inp = forId ? document.getElementById(forId) : l.querySelector('input[type="checkbox"]');
-                    if (inp) { inp.click(); return true; }
+                    var r = l.querySelector('input[type="radio"]');
+                    if (r) { r.click(); return true; }
                     l.click(); return true;
+                }
+            }
+            for (var r of document.querySelectorAll('input[type="radio"]')) {
+                if ((r.value || '').toUpperCase().indexOf('TOEFL') !== -1) {
+                    r.click(); return true;
                 }
             }
             return false;
         """)
         if not clicked:
-            raise Exception("TOEFL checkbox not found on page")
+            raise Exception("TOEFL radio button not found on page")
 
-    def is_ielts_checked(self):
+    def is_ielts_selected(self):
         try:
-            elements = self.driver.find_elements(By.XPATH, self.ielts_checkbox_xpath)
+            elements = self.driver.find_elements(By.XPATH, self.ielts_radio_xpath)
             if elements:
                 return elements[0].is_selected()
         except Exception:
             pass
         return bool(self.driver.execute_script("""
-            var checkboxes = document.querySelectorAll('input[type="checkbox"]');
-            for (var c of checkboxes) {
-                if ((c.value || c.name || c.id || '').toLowerCase().indexOf('ielts') !== -1) {
-                    return c.checked;
+            for (var l of document.querySelectorAll('label')) {
+                if (l.textContent.toUpperCase().indexOf('IELTS') !== -1) {
+                    var r = l.querySelector('input[type="radio"]');
+                    if (r) return r.checked;
                 }
+            }
+            for (var r of document.querySelectorAll('input[type="radio"]')) {
+                if ((r.value || '').toUpperCase().indexOf('IELTS') !== -1) return r.checked;
             }
             return false;
         """))
 
-    def is_toefl_checked(self):
+    def is_toefl_selected(self):
         try:
-            elements = self.driver.find_elements(By.XPATH, self.toefl_checkbox_xpath)
+            elements = self.driver.find_elements(By.XPATH, self.toefl_radio_xpath)
             if elements:
                 return elements[0].is_selected()
         except Exception:
             pass
         return bool(self.driver.execute_script("""
-            var checkboxes = document.querySelectorAll('input[type="checkbox"]');
-            for (var c of checkboxes) {
-                if ((c.value || c.name || c.id || '').toLowerCase().indexOf('toefl') !== -1) {
-                    return c.checked;
+            for (var l of document.querySelectorAll('label')) {
+                if (l.textContent.toUpperCase().indexOf('TOEFL') !== -1) {
+                    var r = l.querySelector('input[type="radio"]');
+                    if (r) return r.checked;
                 }
+            }
+            for (var r of document.querySelectorAll('input[type="radio"]')) {
+                if ((r.value || '').toUpperCase().indexOf('TOEFL') !== -1) return r.checked;
             }
             return false;
         """))

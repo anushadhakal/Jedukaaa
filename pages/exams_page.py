@@ -5,57 +5,32 @@ from selenium.webdriver.support import expected_conditions as EC
 
 class ExamsPage:
 
-    url = "https://www.jeduka.com/exams"
+    # Each exam is an <h3> heading on the page
+    # e.g. <h3>IELTS</h3>, <h3>TOEFL</h3> etc.
+    ielts_xpath = "//h3[contains(text(),'IELTS')]"
+    toefl_xpath = "//h3[contains(text(),'TOEFL')]"
+    gmat_xpath = "//h3[contains(text(),'GMAT')]"
+    gre_xpath = "//h3[contains(text(),'GRE')]"
+    pte_xpath = "//h3[contains(text(),'PTE')]"
+    sat_xpath = "//h3[contains(text(),'SAT')]"
+    duolingo_xpath = "//h3[contains(text(),'Duolingo')]"
+    usmle_xpath = "//h3[contains(text(),'USMLE')]"
 
-    # Exam card locators
-    ielts_xpath = "//*[contains(text(),'IELTS')]"
-    toefl_xpath = "//*[contains(text(),'TOEFL')]"
-    gmat_xpath = "//*[contains(text(),'GMAT')]"
-    gre_xpath = "//*[contains(text(),'GRE')]"
-    pte_xpath = "//*[contains(text(),'PTE')]"
-    sat_xpath = "//*[contains(text(),'SAT')]"
-    duolingo_xpath = "//*[contains(text(),'Duolingo')]"
-    usmle_xpath = "//*[contains(text(),'USMLE')]"
-
-    # IELTS sub-links
-    ielts_about_xpath = "//a[contains(@href,'ielts') and contains(text(),'About')]"
-    ielts_syllabus_xpath = "//a[contains(@href,'ielts') and (contains(text(),'Syllabus') or contains(@href,'syllabus'))]"
-    ielts_pattern_xpath = "//a[contains(@href,'ielts') and (contains(text(),'Pattern') or contains(@href,'pattern'))]"
-    ielts_preparation_xpath = "//a[contains(@href,'ielts') and (contains(text(),'Preparation') or contains(@href,'preparation'))]"
-    ielts_registration_xpath = "//a[contains(@href,'ielts') and (contains(text(),'Registration') or contains(@href,'registration'))]"
+    # IELTS sub-links — <a href="/exams/ielts/...">
+    ielts_sublinks_xpath = "//a[contains(@href,'/exams/ielts')]"
 
     def __init__(self, driver):
         self.driver = driver
 
-    def open(self):
-        self.driver.get(self.url)
-
-    def get_current_url(self):
-        return self.driver.current_url
-
-    def get_title(self):
-        return self.driver.title
-
     def is_exam_visible(self, exam_name):
+        xpath = f"//h3[contains(text(),'{exam_name}')]"
         try:
-            xpath = f"//*[contains(text(),'{exam_name}')]"
-            elements = self.driver.find_elements(By.XPATH, xpath)
-            if elements:
-                return any(el.is_displayed() for el in elements)
-            WebDriverWait(self.driver, 5).until(
-                EC.presence_of_element_located((By.XPATH, xpath))
-            )
-            elements = self.driver.find_elements(By.XPATH, xpath)
-            return any(el.is_displayed() for el in elements)
+            WebDriverWait(self.driver, 5).until(EC.presence_of_element_located((By.XPATH, xpath)))
+            element = self.driver.find_element(By.XPATH, xpath)
+            return element.is_displayed()
         except:
             return False
 
     def get_ielts_sublinks(self):
-        sublinks = self.driver.find_elements(By.XPATH, "//a[contains(@href,'ielts')]")
+        sublinks = self.driver.find_elements(By.XPATH, self.ielts_sublinks_xpath)
         return [link.get_attribute("href") for link in sublinks if link.get_attribute("href")]
-
-    def navigate_to_exam_page(self, exam_slug):
-        self.driver.get(f"https://www.jeduka.com/exams/{exam_slug}")
-
-    def navigate_to_ielts_subpage(self, subpage_slug):
-        self.driver.get(f"https://www.jeduka.com/exams/ielts/{subpage_slug}")
