@@ -5,19 +5,11 @@ from selenium.webdriver.support import expected_conditions as EC
 
 class CountriesPage:
 
-    country_sections = ["USA", "Canada", "France", "Germany", "Netherlands",
-                        "UK", "Australia", "New Zealand", "Switzerland", "Spain"]
-
-    usa_subnav_create_user_xpath = "//a[contains(@href,'study-in-usa') and contains(text(),'Study in USA')]"
-    usa_subnav_cost_xpath = "//a[contains(@href,'cost-of-study-in-usa')]"
-    usa_subnav_universities_xpath = "//a[contains(@href,'usa/universities')]"
-    usa_subnav_scholarships_xpath = "//a[contains(@href,'scholarships-in-usa')]"
-    usa_subnav_intakes_xpath = "//a[contains(@href,'intakes-in-usa')]"
-    usa_subnav_faq_xpath = "//a[contains(@href,'faq-usa')]"
-
+    # Each country card header is ALL CAPS text e.g. "USA", "CANADA"
+    # The links inside each card have mixed case e.g. "Study In USA", "Universities In Canada"
+    h1_xpath = "//h1"
     university_cards_xpath = "//div[contains(@class,'university')] | //div[contains(@class,'card')] | //article"
     apply_now_button_xpath = "//a[contains(text(),'Apply Now')] | //button[contains(text(),'Apply Now')]"
-    h1_xpath = "//h1"
 
     def __init__(self, driver):
         self.driver = driver
@@ -29,6 +21,8 @@ class CountriesPage:
         return h1.text
 
     def is_country_section_visible(self, country_name):
+        # Country name appears in link texts e.g. "Study In Canada", "Universities In France"
+        # so mixed-case search works even though the card header is ALL CAPS
         xpath = f"//*[contains(text(),'{country_name}')]"
         try:
             WebDriverWait(self.driver, 5).until(EC.presence_of_element_located((By.XPATH, xpath)))
@@ -57,6 +51,9 @@ class CountriesPage:
         except:
             return False
 
-    def get_all_subnav_links(self):
-        links = self.driver.find_elements(By.XPATH, "//nav//a | //ul[contains(@class,'sub')]//a")
+    def get_country_card_links(self, country_name):
+        # Returns all links inside a specific country's card
+        # e.g. "Study In USA", "Universities In USA" etc.
+        xpath = f"//a[contains(text(),'{country_name}')]"
+        links = self.driver.find_elements(By.XPATH, xpath)
         return [link.get_attribute("href") for link in links if link.get_attribute("href")]

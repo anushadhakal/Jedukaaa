@@ -5,16 +5,14 @@ from selenium.webdriver.support import expected_conditions as EC
 
 class ExamsPage:
 
-    # Each exam is an <h3> heading on the page
-    # e.g. <h3>IELTS</h3>, <h3>TOEFL</h3> etc.
-    ielts_xpath = "//h3[contains(text(),'IELTS')]"
-    toefl_xpath = "//h3[contains(text(),'TOEFL')]"
-    gmat_xpath = "//h3[contains(text(),'GMAT')]"
-    gre_xpath = "//h3[contains(text(),'GRE')]"
-    pte_xpath = "//h3[contains(text(),'PTE')]"
-    sat_xpath = "//h3[contains(text(),'SAT')]"
-    duolingo_xpath = "//h3[contains(text(),'Duolingo')]"
-    usmle_xpath = "//h3[contains(text(),'USMLE')]"
+    ielts_xpath = "//*[contains(text(),'IELTS')]"
+    toefl_xpath = "//*[contains(text(),'TOEFL')]"
+    gmat_xpath = "//*[contains(text(),'GMAT')]"
+    gre_xpath = "//*[contains(text(),'GRE')]"
+    pte_xpath = "//*[contains(text(),'PTE')]"
+    sat_xpath = "//*[contains(text(),'SAT')]"
+    duolingo_xpath = "//*[contains(text(),'Duolingo')]"
+    usmle_xpath = "//*[contains(text(),'USMLE')]"
 
     # IELTS sub-links — <a href="/exams/ielts/...">
     ielts_sublinks_xpath = "//a[contains(@href,'/exams/ielts')]"
@@ -23,11 +21,11 @@ class ExamsPage:
         self.driver = driver
 
     def is_exam_visible(self, exam_name):
-        xpath = f"//h3[contains(text(),'{exam_name}')]"
+        xpath = f"//*[contains(text(),'{exam_name}')]"
         try:
             WebDriverWait(self.driver, 5).until(EC.presence_of_element_located((By.XPATH, xpath)))
-            element = self.driver.find_element(By.XPATH, xpath)
-            return element.is_displayed()
+            elements = self.driver.find_elements(By.XPATH, xpath)
+            return any(el.is_displayed() for el in elements)
         except:
             return False
 

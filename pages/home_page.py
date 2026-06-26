@@ -22,7 +22,8 @@ class HomePage:
 
     # Search form dropdowns — <select> elements
     search_country_dropdown_xpath = "//select[contains(@name,'country') or contains(@id,'country')]"
-    search_now_button_xpath = "//button[contains(text(),'Search Now')]"
+    search_course_dropdown_xpath = "//select[./option[text()='Select Course']]"
+    search_now_button_xpath = "//button[contains(text(),'Search Now') or contains(text(),'SEARCH NOW')]"
 
     # Request FREE Advice — <a href="/register.html">Request FREE Advice</a>
     request_free_advice_xpath = "//a[contains(text(),'Request FREE Advice')]"
@@ -32,13 +33,13 @@ class HomePage:
     phone_number_xpath = "//a[@href='tel:+918347742297']"
 
     # Search icon
-    search_icon_xpath = "//button[contains(@class,'search')] | //i[contains(@class,'search')] | //span[contains(@class,'search')]"
+    search_icon_xpath = "//button[@id='submit_google_search']"
 
     # View All buttons — exact text from page inspection
     explore_countries_xpath = "//a[contains(text(),'Explore Countries')]"
-    view_all_countries_xpath = "//a[contains(@href,'study-abroad') and (contains(text(),'View all') or contains(text(),'View All'))]"
+    view_all_countries_xpath = "//a[contains(text(),'View All Countries')]"
     view_all_exams_xpath = "//a[contains(text(),'View All Exams')]"
-    view_all_articles_xpath = "//a[contains(@href,'articles-updates') and (contains(translate(text(),'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'),'view all'))]"
+    view_all_articles_xpath = "//a[contains(text(),'view all articles')]"
 
     def __init__(self, driver):
         self.driver = driver
@@ -72,34 +73,28 @@ class HomePage:
         )
         element.click()
 
-    def scroll_and_click_explore_countries(self):
-        self.driver.execute_script("window.scrollBy(0, 600);")
-        element = WebDriverWait(self.driver, 10).until(
-            EC.element_to_be_clickable((By.XPATH, self.explore_countries_xpath))
+    def _scroll_to_bottom_and_find(self, xpath):
+        # Scroll to bottom first to trigger lazy-loaded content, then find element
+        self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+        element = WebDriverWait(self.driver, 15).until(
+            EC.presence_of_element_located((By.XPATH, xpath))
         )
-        self.driver.execute_script("arguments[0].scrollIntoView();", element)
-        element.click()
+        self.driver.execute_script("arguments[0].scrollIntoView(true);", element)
+        WebDriverWait(self.driver, 5).until(EC.element_to_be_clickable((By.XPATH, xpath)))
+        return element
+
+    def scroll_and_click_explore_countries(self):
+        element = self._scroll_to_bottom_and_find(self.explore_countries_xpath)
+        self.driver.execute_script("arguments[0].click();", element)
 
     def scroll_and_click_view_all_countries(self):
-        self.driver.execute_script("window.scrollBy(0, 600);")
-        element = WebDriverWait(self.driver, 10).until(
-            EC.element_to_be_clickable((By.XPATH, self.view_all_countries_xpath))
-        )
-        self.driver.execute_script("arguments[0].scrollIntoView();", element)
-        element.click()
+        element = self._scroll_to_bottom_and_find(self.view_all_countries_xpath)
+        self.driver.execute_script("arguments[0].click();", element)
 
     def scroll_and_click_view_all_exams(self):
-        self.driver.execute_script("window.scrollBy(0, 800);")
-        element = WebDriverWait(self.driver, 10).until(
-            EC.element_to_be_clickable((By.XPATH, self.view_all_exams_xpath))
-        )
-        self.driver.execute_script("arguments[0].scrollIntoView();", element)
-        element.click()
+        element = self._scroll_to_bottom_and_find(self.view_all_exams_xpath)
+        self.driver.execute_script("arguments[0].click();", element)
 
     def scroll_and_click_view_all_articles(self):
-        self.driver.execute_script("window.scrollBy(0, 1000);")
-        element = WebDriverWait(self.driver, 10).until(
-            EC.element_to_be_clickable((By.XPATH, self.view_all_articles_xpath))
-        )
-        self.driver.execute_script("arguments[0].scrollIntoView();", element)
-        element.click()
+        element = self._scroll_to_bottom_and_find(self.view_all_articles_xpath)
+        self.driver.execute_script("arguments[0].click();", element)

@@ -4,6 +4,7 @@ import requests
 from selenium.webdriver.common.by import By
 
 
+
 class TestNavigation:
 
     # TC38
@@ -23,7 +24,8 @@ class TestNavigation:
         time.sleep(1)
         assert "study-in-usa" in driver.current_url, "Forward navigation failed"
 
-    # TC39
+    # TC39 — BUG-001: https://www.jeduka.com/faq-usa returns 404
+    @pytest.mark.xfail(reason="BUG-001: FAQ USA navbar link is broken — returns 404")
     def test_no_broken_navbar_links(self, driver):
         driver.get("https://www.jeduka.com/")
         time.sleep(2)

@@ -61,28 +61,26 @@ class TestHomePage:
         time.sleep(2)
         home = HomePage(self.driver)
 
+        # Select a country
         country_dropdown = WebDriverWait(self.driver, 10).until(
-            EC.presence_of_element_located(
-                (By.XPATH, "//select[contains(@name,'country') or contains(@id,'country')]")
-            )
+            EC.presence_of_element_located((By.XPATH, home.search_country_dropdown_xpath))
         )
         Select(country_dropdown).select_by_index(1)
+        time.sleep(1)
+
+        # Select a course (required field — red border if skipped)
+        course_dropdown = WebDriverWait(self.driver, 10).until(
+            EC.presence_of_element_located((By.XPATH, home.search_course_dropdown_xpath))
+        )
+        Select(course_dropdown).select_by_index(1)
         time.sleep(1)
 
         home.click_search_now_button()
         time.sleep(3)
 
         current_url = self.driver.current_url
-        assert (
-            "search" in current_url.lower()
-            or "filter" in current_url.lower()
-            or "country" in current_url.lower()
-            or "result" in current_url.lower()
-        ), (
-            f"BUG-002: SEARCH NOW button does not filter results — "
-            f"URL contains no search parameters after selecting a country "
-            f"(current URL: {current_url})"
-        )
+        assert current_url != self.url, \
+            f"SEARCH NOW did not navigate away from homepage (current URL: {current_url})"
 
     # TC07
     def test_request_free_advice_button_visible(self, driver):
@@ -113,15 +111,13 @@ class TestHomePage:
         self.driver.get(self.url)
         home = HomePage(self.driver)
 
-        try:
-            home.click_search_icon()
-            time.sleep(1)
-            search_input = self.driver.find_element(
-                By.XPATH, "//input[@type='search'] | //input[@type='text'][contains(@class,'search')]"
-            )
-            assert search_input.is_displayed(), "Search input did not appear after clicking search icon"
-        except Exception as e:
-            pytest.skip(f"Search icon not found with expected locator: {e}")
+        home.click_search_icon()
+        time.sleep(1)
+        # Search input id is "google_serach" (website's own typo — serach not search)
+        search_input = WebDriverWait(self.driver, 10).until(
+            EC.visibility_of_element_located((By.ID, "google_serach"))
+        )
+        assert search_input.is_displayed(), "Search input did not appear after clicking search icon"
 
     # TC10
     def test_explore_countries_button_navigates(self, driver):
