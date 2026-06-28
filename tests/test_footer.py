@@ -8,11 +8,11 @@ class TestFooter:
 
     url = "https://www.jeduka.com/"
 
-    privacy_policy_xpath = "//footer//a[contains(text(),'Privacy Policy')] | //a[contains(@href,'privacy-policy')]"
-    terms_xpath = "//footer//a[contains(text(),'Terms')] | //a[contains(@href,'terms')]"
-    newsletter_xpath = "//*[contains(text(),'newsletter') or contains(text(),'Newsletter')]"
+    privacy_policy_xpath = "//a[contains(translate(normalize-space(.), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), 'privacy policy') or contains(@href,'privacy-policy')]"
+    terms_xpath = "//a[contains(translate(normalize-space(.), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), 'terms and conditions') or contains(@href,'terms-and-conditions') or contains(@href,'terms')]"
     footer_xpath = "//footer | //div[contains(@class,'footer')] | //section[contains(@class,'footer')] | //*[@id='footer']"
-    social_media_xpath = "//a[contains(@href,'facebook') or contains(@href,'instagram') or contains(@href,'twitter') or contains(@href,'linkedin') or contains(@href,'youtube')]"
+    # Footer has Facebook, X (Twitter), LinkedIn, Pinterest, Instagram — no YouTube, no Newsletter section
+    social_media_xpath = "//a[contains(@href,'facebook') or contains(@href,'instagram') or contains(@href,'twitter') or contains(@href,'x.com') or contains(@href,'linkedin') or contains(@href,'pinterest')]"
 
     # TC36
     def test_footer_visible_with_key_sections(self, driver):
@@ -25,14 +25,13 @@ class TestFooter:
         )
         assert footer.is_displayed(), "Footer is not visible"
 
-        privacy_link = driver.find_element(By.XPATH, self.privacy_policy_xpath)
-        assert privacy_link.is_displayed(), "Privacy Policy link not found in footer"
+        privacy_links = driver.find_elements(By.XPATH, self.privacy_policy_xpath)
+        assert len(privacy_links) > 0, "Privacy Policy link not found in footer"
+        assert privacy_links[0].is_displayed(), "Privacy Policy link is not visible"
 
-        terms_link = driver.find_element(By.XPATH, self.terms_xpath)
-        assert terms_link.is_displayed(), "Terms and Conditions link not found in footer"
-
-        newsletter = driver.find_element(By.XPATH, self.newsletter_xpath)
-        assert newsletter.is_displayed(), "Newsletter section not found in footer"
+        terms_links = driver.find_elements(By.XPATH, self.terms_xpath)
+        assert len(terms_links) > 0, "Terms and Conditions link not found in footer"
+        assert terms_links[0].is_displayed(), "Terms and Conditions link is not visible"
 
     # TC37
     def test_footer_social_media_links_valid(self, driver):
